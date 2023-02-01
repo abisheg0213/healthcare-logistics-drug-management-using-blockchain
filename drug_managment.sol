@@ -53,7 +53,7 @@ contract drugcompany
     {
         drugs[pi].avail+=k;
     }
-    function valid_hos(uint j) constant public returns(bool)
+    function valid_hos(uint j) returns(bool)
     {
         uint flag=0;
         for(uint i=0;i<hospitals.length;i++)
