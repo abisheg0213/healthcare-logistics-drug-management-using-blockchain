@@ -23,6 +23,21 @@ contract drugcompany
     mapping (uint => order)orders;
     uint [] hospitals;
     uint public income=0;
+       struct patient
+   {
+       uint hospid;
+   }
+   struct patient_log
+   {
+       uint patientid;
+       uint docid;
+       uint timestamp;
+       uint drugid;
+       uint amount;
+   }
+   mapping (uint => patient) patients;
+   mapping (uint => patient_log) logs;
+   uint logid=1;
     modifier onlydm(address d)
     {
         require(d==drugmanager);
@@ -84,7 +99,7 @@ contract drugcompany
         require(hy< drugs[k].threosold);
         _;
     }
-    function buy_drug (uint h,uint porid,uint req_amount) public validhos(h) meetavail(req_amount,porid) meetthros(porid,req_amount)
+      function buy_drug (uint h,uint porid,uint req_amount,uint did,uint patid) public validhos(h) meetavail(req_amount,porid) meetthros(porid,req_amount)
     {
         drugs[porid].avail-=req_amount;
         income+=(req_amount*drugs[porid].rate);
@@ -94,6 +109,12 @@ contract drugcompany
         orders[orderdid].quantity=req_amount;
         orders[orderdid].amount=req_amount*drugs[porid].rate;
         orderdid+=1;
+       logs[logid].patientid=patid;
+        logs[logid].docid=did;
+        logs[logid].timestamp=now;
+        logs[logid].drugid=porid;
+        logs[logid].amount=req_amount;
+        logid+=1;
     }
     function drug_av(uint pid) constant public returns(uint) 
     {
