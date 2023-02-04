@@ -35,6 +35,8 @@ contract drugcompany
        uint drugid;
        uint amount;
    }
+   uint [] patientarr;
+   uint [] doctors;
    mapping (uint => patient) patients;
    mapping (uint => patient_log) logs;
    uint logid=1;
@@ -56,6 +58,15 @@ contract drugcompany
     function reg_hos(uint y) public onlyhm(msg.sender)
     {
         hospitals.push(y);
+    }
+    function reg_patient(uint y,uint hi) public onlyhm(msg.sender)
+    {
+        patientarr.push(y);
+        patients[y].hospid=hi;
+    }
+        function reg_doctor(uint y) public onlyhm(msg.sender)
+    {
+        doctors.push(y);
     }
     function add_drug(uint p,uint a,uint t,uint r) public onlydm(msg.sender)
     {
@@ -84,9 +95,51 @@ contract drugcompany
             return false;
         }
     }
+        function valid_pait(uint j) returns(bool)
+    {
+        uint flag=0;
+        for(uint i=0;i<patientarr.length;i++)
+        {
+            if(patientarr[i]==j)
+            {
+                flag=1;
+                return true;
+            }
+        }
+        if (flag==0)
+        {
+            return false;
+        }
+    }
+        function valid_doctors(uint j) returns(bool)
+    {
+        uint flag=0;
+        for(uint i=0;i<doctors.length;i++)
+        {
+            if(doctors[i]==j)
+            {
+                flag=1;
+                return true;
+            }
+        }
+        if (flag==0)
+        {
+            return false;
+        }
+    }
     modifier validhos(uint tr)
     {
         require(valid_hos(tr)==true);
+        _;
+    }
+      modifier validp(uint tr)
+    {
+        require(valid_pait(tr)==true);
+        _;
+    }
+      modifier validd(uint tr)
+    {
+        require(valid_doctors(tr)==true);
         _;
     }
     modifier meetavail(uint hy,uint k)
@@ -99,7 +152,7 @@ contract drugcompany
         require(hy< drugs[k].threosold);
         _;
     }
-      function buy_drug (uint h,uint porid,uint req_amount,uint did,uint patid) public validhos(h) meetavail(req_amount,porid) meetthros(porid,req_amount)
+      function buy_drug (uint h,uint porid,uint req_amount,uint did,uint patid) public validhos(h) meetavail(req_amount,porid) meetthros(porid,req_amount) validp(patid) validd(did)
     {
         drugs[porid].avail-=req_amount;
         income+=(req_amount*drugs[porid].rate);
