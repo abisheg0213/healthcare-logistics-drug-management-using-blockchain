@@ -65,7 +65,12 @@ contract drugcompany
         uint amount;
     }
     mapping (uint => producer_content) produced_drug;
-    function add_produced_drug(uint pid,uint a)
+    modifier onlyproducer(address j)
+    {
+        require(j==producer);
+        _;
+    }
+    function add_produced_drug(uint pid,uint a) onlyproducer(msg.sender)
     {
         produced_drug[pid].amount=a;
     }
