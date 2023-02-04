@@ -8,6 +8,7 @@ contract drugcompany
         uint rate;
     }
     mapping (uint => product)drugs;
+    address producer;
     address drugmanager;
     address hospitalmanager;
     // uint public prodid=0;
@@ -50,10 +51,23 @@ contract drugcompany
         require(d==hospitalmanager);
         _;
     }
+    function reg_producer(address w) public onlydm(msg.sender)
+    {
+        producer=w;
+    }
     function drugcompany(address hm)
     {
         drugmanager=msg.sender;
         hospitalmanager=hm;
+    }
+    struct producer_content
+    {
+        uint amount;
+    }
+    mapping (uint => producer_content) produced_drug;
+    function add_produced_drug(uint pid,uint a)
+    {
+        produced_drug[pid].amount=a;
     }
     function reg_hos(uint y) public onlyhm(msg.sender)
     {
@@ -68,14 +82,19 @@ contract drugcompany
     {
         doctors.push(y);
     }
-    function add_drug(uint p,uint a,uint t,uint r) public onlydm(msg.sender)
+    modifier validam(uint d,uint p)
+    {
+        require(produced_drug[p].amount==d);
+        _;
+    }
+    function add_drug(uint p,uint a,uint t,uint r) public onlydm(msg.sender) validam(a,p)
     {
        drugs[p].avail=a;
         drugs[p].threosold=t;
         drugs[p].rate=r;
         // prodid+=1;
     }
-    function update_avail(uint pi,uint k) public onlydm(msg.sender)
+    function update_avail(uint pi,uint k) public onlydm(msg.sender) validam(k,pi)
     {
         drugs[pi].avail+=k;
     }
