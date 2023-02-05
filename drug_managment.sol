@@ -1,4 +1,4 @@
-pragma solidity ^0.4.10;
+pragma solidity ^0.8.14;
 contract drugcompany
 {
     struct product
@@ -55,7 +55,7 @@ contract drugcompany
     {
         producer=w;
     }
-    function drugcompany(address hm)
+    constructor(address hm)
     {
         drugmanager=msg.sender;
         hospitalmanager=hm;
@@ -70,7 +70,7 @@ contract drugcompany
         require(j==producer);
         _;
     }
-    function add_produced_drug(uint pid,uint a) onlyproducer(msg.sender)
+    function add_produced_drug(uint pid,uint a) public onlyproducer(msg.sender)
     {
         produced_drug[pid].amount=a;
     }
@@ -103,7 +103,7 @@ contract drugcompany
     {
         drugs[pi].avail+=k;
     }
-    function valid_hos(uint j) returns(bool)
+    function valid_hos(uint j) private returns(bool)
     {
         uint flag=0;
         for(uint i=0;i<hospitals.length;i++)
@@ -119,7 +119,7 @@ contract drugcompany
             return false;
         }
     }
-        function valid_pait(uint j) returns(bool)
+        function valid_pait(uint j) private returns(bool)
     {
         uint flag=0;
         for(uint i=0;i<patientarr.length;i++)
@@ -135,7 +135,7 @@ contract drugcompany
             return false;
         }
     }
-        function valid_doctors(uint j) returns(bool)
+        function valid_doctors(uint j) private returns(bool)
     {
         uint flag=0;
         for(uint i=0;i<doctors.length;i++)
@@ -181,19 +181,19 @@ contract drugcompany
         drugs[porid].avail-=req_amount;
         income+=(req_amount*drugs[porid].rate);
         orders[orderdid].hospid=h;
-        orders[orderdid].time=now;
+        orders[orderdid].time=block.timestamp;
         orders[orderdid].drugid=porid;
         orders[orderdid].quantity=req_amount;
         orders[orderdid].amount=req_amount*drugs[porid].rate;
         orderdid+=1;
        logs[logid].patientid=patid;
         logs[logid].docid=did;
-        logs[logid].timestamp=now;
+        logs[logid].timestamp=block.timestamp;
         logs[logid].drugid=porid;
         logs[logid].amount=req_amount;
         logid+=1;
     }
-    function drug_av(uint pid) constant public returns(uint) 
+    function drug_av(uint pid) view public returns(uint) 
     {
         return drugs[pid].avail;
     }
